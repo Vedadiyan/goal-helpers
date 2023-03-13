@@ -176,7 +176,7 @@ func ToJSONReq[TReq proto.Message](m TReq, reqMapper []byte) (http.RouteValues, 
 	return routeValue, query, json, nil
 }
 
-func ToJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte) (TRes, error) {
+func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte) (TRes, error) {
 	r, err := New(string(resMapper)).OnJSONStream(data)
 	if err != nil {
 		return *new(TRes), err
