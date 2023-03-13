@@ -28,17 +28,28 @@ func New(query string) *Query {
 	return &q
 }
 
+func (q Query) exec(data map[string]any) (any, error) {
+	if q.query == "" {
+		return data, nil
+	}
+	query := sql.New(data)
+	err := query.Prepare(q.query)
+	if err != nil {
+		return nil, err
+	}
+	r, err := query.Exec()
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
+}
+
 func (q Query) OnProtobuf(m proto.Message) (*Result, error) {
 	req, err := protoutil.Marshal(m)
 	if err != nil {
 		return nil, err
 	}
-	query := sql.New(req)
-	err = query.Prepare(q.query)
-	if err != nil {
-		return nil, err
-	}
-	r, err := query.Exec()
+	r, err := q.exec(req)
 	if err != nil {
 		return nil, err
 	}
@@ -54,12 +65,7 @@ func (q Query) OnJSON(bytes []byte) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	query := sql.New(mapper)
-	err = query.Prepare(q.query)
-	if err != nil {
-		return nil, err
-	}
-	r, err := query.Exec()
+	r, err := q.exec(mapper)
 	if err != nil {
 		return nil, err
 	}

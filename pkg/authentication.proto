@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+option go_package = "helpers/pb";
+
+message WebHeaders {
+    map<string, string> web_headers = 1; 
+}
