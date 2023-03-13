@@ -156,7 +156,7 @@ func (r Result) RouteValues() (map[string]string, error) {
 	return out, nil
 }
 
-func JSONReq[TReq proto.Message](m TReq, reqMapper []byte) (http.RouteValues, http.Query, http.JSON, error) {
+func ToJSONReq[TReq proto.Message](m TReq, reqMapper []byte) (http.RouteValues, http.Query, http.JSON, error) {
 	r, err := New(string(reqMapper)).OnProtobuf(m)
 	if err != nil {
 		return nil, nil, "", err
@@ -176,7 +176,7 @@ func JSONReq[TReq proto.Message](m TReq, reqMapper []byte) (http.RouteValues, ht
 	return routeValue, query, json, nil
 }
 
-func JSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte) (TRes, error) {
+func ToJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte) (TRes, error) {
 	r, err := New(string(resMapper)).OnJSONStream(data)
 	if err != nil {
 		return *new(TRes), err
