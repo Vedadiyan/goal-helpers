@@ -6,11 +6,17 @@ import (
 	"github.com/nats-io/nats.go"
 	pb "github.com/vedadiyan/goal-helpers/pkg/helpers/pb"
 	codecs "github.com/vedadiyan/goal/pkg/bus/nats"
+	"github.com/vedadiyan/goal/pkg/di"
 )
 
 var codec codecs.CompressedProtoConn
 
-func GetAuthHeaders(conn *nats.Conn, namespace string) (map[string]string, error) {
+func GetAuthHeaders(connName string, namespace string) (map[string]string, error) {
+	c, err := di.ResolveWithName[*nats.Conn](connName, nil)
+	if err != nil {
+		return nil, err
+	}
+	conn := *c
 	msg, err := conn.Request(namespace, nil, time.Second*30)
 	if err != nil {
 		return nil, err
@@ -23,7 +29,12 @@ func GetAuthHeaders(conn *nats.Conn, namespace string) (map[string]string, error
 	return webHeaders.WebHeaders, nil
 }
 
-func SendAuthHeaders(conn *nats.Conn, reply string, authHeaders map[string]string) error {
+func SendAuthHeaders(connName string, reply string, authHeaders map[string]string) error {
+	c, err := di.ResolveWithName[*nats.Conn](connName, nil)
+	if err != nil {
+		return err
+	}
+	conn := *c
 	webHeaders := pb.WebHeaders{}
 	webHeaders.WebHeaders = authHeaders
 	bytes, err := codec.Encode(reply, &webHeaders)
