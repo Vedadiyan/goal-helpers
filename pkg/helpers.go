@@ -21,6 +21,12 @@ type Query struct {
 	query string
 }
 
+type Request[T any] struct {
+	RouteValues map[string]string
+	QueryParams map[string][]string
+	Body        T
+}
+
 func New(query string) *Query {
 	q := Query{
 		query: query,
@@ -156,24 +162,29 @@ func (r Result) RouteValues() (map[string]string, error) {
 	return out, nil
 }
 
-func ToJSONReq[TReq proto.Message](m TReq, reqMapper []byte) (http.RouteValues, http.Query, http.JSON, error) {
+func ToJSONReq[TReq proto.Message](m TReq, reqMapper []byte) (*Request[http.JSON], error) {
 	r, err := New(string(reqMapper)).OnProtobuf(m)
 	if err != nil {
-		return nil, nil, "", err
+		return nil, err
 	}
 	routeValue, err := r.RouteValues()
 	if err != nil {
-		return nil, nil, "", err
+		return nil, err
 	}
 	query, err := r.QueryParams()
 	if err != nil {
-		return nil, nil, "", err
+		return nil, err
 	}
 	json, err := r.ToJSON()
 	if err != nil {
-		return nil, nil, "", err
+		return nil, err
 	}
-	return routeValue, query, json, nil
+	req := Request[http.JSON]{
+		RouteValues: routeValue,
+		QueryParams: query,
+		Body:        json,
+	}
+	return &req, nil
 }
 
 func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte) (TRes, error) {
