@@ -7,9 +7,11 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/vedadiyan/goal/pkg/http"
 	"github.com/vedadiyan/goal/pkg/protoutil"
 	"github.com/vedadiyan/gql/pkg/sql"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -198,6 +200,38 @@ func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte) (TRes
 		return *new(TRes), err
 	}
 	return m, nil
+}
+
+func GetJSONReq[T proto.Message](c *fiber.Ctx) (T, error) {
+	values := make(map[string]any)
+	for _, key := range c.Route().Params {
+		values[fmt.Sprintf(":%s", key)] = c.Params(key)
+	}
+	c.Request().URI().QueryArgs().VisitAll(func(key, value []byte) {
+		values[fmt.Sprintf("$%s", key)] = string(value)
+	})
+	if len(c.Body()) != 0 {
+		c.BodyParser(&values)
+	}
+	out, err := json.Marshal(values)
+	if err != nil {
+		return *new(T), err
+	}
+	var res T
+	err = protojson.Unmarshal(out, res)
+	if err != nil {
+		return *new(T), err
+	}
+	return res, nil
+}
+
+func SendJSONRes[T proto.Message](data T, c *fiber.Ctx) error {
+	out, err := protojson.Marshal(data)
+	if err != nil {
+		return err
+	}
+	c.Response().Header.Add("content-type", "application/json")
+	return c.Send(out)
 }
 
 func filter(data map[string]any) map[string]any {
