@@ -189,19 +189,19 @@ func ToJSONReq[TReq proto.Message](m TReq, reqMapper []byte) (*Request[http.JSON
 	return &req, nil
 }
 
-func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte, m TRes) (TRes, error) {
+func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte, m TRes) error {
 	r, err := New(string(resMapper)).OnJSONStream(data)
 	if err != nil {
-		return *new(TRes), err
+		return err
 	}
 	err = r.ToProtobuf(m)
 	if err != nil {
-		return *new(TRes), err
+		return err
 	}
-	return m, nil
+	return nil
 }
 
-func GetJSONReq[T proto.Message](c *fiber.Ctx, req T) (T, error) {
+func GetJSONReq[T proto.Message](c *fiber.Ctx, req T) error {
 	values := make(map[string]any)
 	for _, key := range c.Route().Params {
 		values[fmt.Sprintf("%s", key)] = c.Params(key)
@@ -214,13 +214,13 @@ func GetJSONReq[T proto.Message](c *fiber.Ctx, req T) (T, error) {
 	}
 	out, err := json.Marshal(values)
 	if err != nil {
-		return *new(T), err
+		return err
 	}
 	err = protojson.Unmarshal(out, req)
 	if err != nil {
-		return *new(T), err
+		return err
 	}
-	return req, nil
+	return nil
 }
 
 func SendJSONRes[T proto.Message](data T, c *fiber.Ctx) error {
