@@ -88,11 +88,11 @@ func (q Query) OnJSONStream(stream io.ReadCloser) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	return q.OnJSON(bytes)
+	return q.OnJSON([]byte(fmt.Sprintf(`{ "$": %s }`, string(bytes))))
 }
 
 func (r Result) ToJSON() (http.JSON, error) {
-	json, err := json.Marshal(filter(r.result.(map[string]any)))
+	json, err := json.Marshal(filter(r.result.([]any)[0].(map[string]any)))
 	if err != nil {
 		return "", err
 	}
@@ -100,7 +100,7 @@ func (r Result) ToJSON() (http.JSON, error) {
 }
 
 func (r Result) ToProtobuf(m proto.Message) error {
-	err := protoutil.Unmarshal(r.result.(map[string]any), m)
+	err := protoutil.Unmarshal(r.result.([]any)[0].(map[string]any), m)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (r Result) ToProtobuf(m proto.Message) error {
 }
 
 func (r Result) QueryParams() (map[string][]string, error) {
-	flattened := FlattenMap(r.result.(map[string]any))
+	flattened := FlattenMap(r.result.([]any)[0].(map[string]any))
 	pattern := `\{.*?\}`
 	re := regexp.MustCompile(pattern)
 	out := make(map[string][]string)
@@ -144,7 +144,7 @@ func (r Result) QueryParams() (map[string][]string, error) {
 }
 
 func (r Result) RouteValues() (map[string]string, error) {
-	flattened := FlattenMap(r.result.(map[string]any))
+	flattened := FlattenMap(r.result.([]any)[0].(map[string]any))
 	out := make(map[string]string)
 	for key, value := range flattened {
 		n := strings.Count(key, ":")
@@ -189,12 +189,11 @@ func ToJSONReq[TReq proto.Message](m TReq, reqMapper []byte) (*Request[http.JSON
 	return &req, nil
 }
 
-func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte) (TRes, error) {
+func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte, m TRes) (TRes, error) {
 	r, err := New(string(resMapper)).OnJSONStream(data)
 	if err != nil {
 		return *new(TRes), err
 	}
-	var m TRes
 	err = r.ToProtobuf(m)
 	if err != nil {
 		return *new(TRes), err
@@ -202,13 +201,13 @@ func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte) (TRes
 	return m, nil
 }
 
-func GetJSONReq[T proto.Message](c *fiber.Ctx) (T, error) {
+func GetJSONReq[T proto.Message](c *fiber.Ctx, req T) (T, error) {
 	values := make(map[string]any)
 	for _, key := range c.Route().Params {
-		values[fmt.Sprintf(":%s", key)] = c.Params(key)
+		values[fmt.Sprintf("%s", key)] = c.Params(key)
 	}
 	c.Request().URI().QueryArgs().VisitAll(func(key, value []byte) {
-		values[fmt.Sprintf("$%s", key)] = string(value)
+		values[fmt.Sprintf("%s", key)] = string(value)
 	})
 	if len(c.Body()) != 0 {
 		c.BodyParser(&values)
@@ -217,12 +216,11 @@ func GetJSONReq[T proto.Message](c *fiber.Ctx) (T, error) {
 	if err != nil {
 		return *new(T), err
 	}
-	var res T
-	err = protojson.Unmarshal(out, res)
+	err = protojson.Unmarshal(out, req)
 	if err != nil {
 		return *new(T), err
 	}
-	return res, nil
+	return req, nil
 }
 
 func SendJSONRes[T proto.Message](data T, c *fiber.Ctx) error {
