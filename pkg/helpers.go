@@ -88,7 +88,7 @@ func (q Query) OnJSONStream(stream io.ReadCloser) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	return q.OnJSON([]byte(fmt.Sprintf(`{ "$": %s }`, string(bytes))))
+	return q.OnJSON([]byte(string(bytes)))
 }
 
 func (r Result) ToJSON() (http.JSON, error) {
@@ -100,7 +100,10 @@ func (r Result) ToJSON() (http.JSON, error) {
 }
 
 func (r Result) ToProtobuf(m proto.Message) error {
-	err := protoutil.Unmarshal(r.result.([]any)[0].(map[string]any), m)
+	// if len(r.result.([]any)) == 0 {
+	// 	return nil
+	// }
+	err := protoutil.Unmarshal(r.result, m)
 	if err != nil {
 		return err
 	}
@@ -108,6 +111,9 @@ func (r Result) ToProtobuf(m proto.Message) error {
 }
 
 func (r Result) QueryParams() (map[string][]string, error) {
+	if len(r.result.([]any)) == 0 {
+		return nil, nil
+	}
 	flattened := FlattenMap(r.result.([]any)[0].(map[string]any))
 	pattern := `\{.*?\}`
 	re := regexp.MustCompile(pattern)
@@ -144,6 +150,9 @@ func (r Result) QueryParams() (map[string][]string, error) {
 }
 
 func (r Result) RouteValues() (map[string]string, error) {
+	if len(r.result.([]any)) == 0 {
+		return nil, nil
+	}
 	flattened := FlattenMap(r.result.([]any)[0].(map[string]any))
 	out := make(map[string]string)
 	for key, value := range flattened {
@@ -187,6 +196,18 @@ func ToJSONReq[TReq proto.Message](m TReq, reqMapper []byte) (*Request[http.JSON
 		Body:        json,
 	}
 	return &req, nil
+}
+
+func Exec[TReq proto.Message, TRes proto.Message](m TReq, reqMapper []byte, r TRes) error {
+	res, err := New(string(reqMapper)).OnProtobuf(m)
+	if err != nil {
+		return err
+	}
+	err = res.ToProtobuf(r)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte, m TRes) error {
