@@ -269,13 +269,16 @@ func filter(data any) any {
 	switch t := data.(type) {
 	case map[string]any:
 		{
+			if len(t) == 0 {
+				return t
+			}
 			copy := make(map[string]any)
 			for key, value := range t {
 				if strings.Contains(key, "$") || strings.Contains(key, ":") {
 					continue
 				}
-				filter(value)
-				copy[key] = value
+				res := filter(value)
+				copy[key] = res
 			}
 			if len(copy) == 0 {
 				return nil
@@ -284,6 +287,9 @@ func filter(data any) any {
 		}
 	case []any:
 		{
+			if len(t) == 0 {
+				return t
+			}
 			copy := make([]any, 0)
 			for _, item := range t {
 				res := filter(item)
