@@ -92,7 +92,11 @@ func (q Query) OnJSONStream(stream io.ReadCloser) (*Result, error) {
 }
 
 func (r Result) ToJSON() (http.JSON, error) {
-	json, err := json.Marshal(filter(r.result.([]any)[0].(map[string]any)))
+	res := filter(r.result.([]any)[0])
+	if res == nil {
+		return http.JSON(""), nil
+	}
+	json, err := json.Marshal(res)
 	if err != nil {
 		return "", err
 	}
@@ -225,10 +229,10 @@ func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte, m TRe
 func GetJSONReq[T proto.Message](c *fiber.Ctx, req T) error {
 	values := make(map[string]any)
 	for _, key := range c.Route().Params {
-		values[fmt.Sprintf("%s", key)] = c.Params(key)
+		values[key] = c.Params(key)
 	}
 	c.Request().URI().QueryArgs().VisitAll(func(key, value []byte) {
-		values[fmt.Sprintf("%s", key)] = string(value)
+		values[string(key)] = string(value)
 	})
 	if len(c.Body()) != 0 {
 		c.BodyParser(&values)
@@ -253,13 +257,48 @@ func SendJSONRes[T proto.Message](data T, c *fiber.Ctx) error {
 	return c.Send(out)
 }
 
-func filter(data map[string]any) map[string]any {
-	out := make(map[string]any)
-	for key, value := range FlattenMap(data) {
-		if strings.Contains(key, "$") || strings.Contains(key, ":") {
-			continue
+func filter(data any) any {
+	// out := make(map[string]any)
+	// for key, value := range FlattenMap(data) {
+	// 	if strings.Contains(key, "$") || strings.Contains(key, ":") {
+	// 		continue
+	// 	}
+	// 	out[key] = value
+	// }
+	// return UnFlatten(out)
+	switch t := data.(type) {
+	case map[string]any:
+		{
+			copy := make(map[string]any)
+			for key, value := range t {
+				if strings.Contains(key, "$") || strings.Contains(key, ":") {
+					continue
+				}
+				filter(value)
+				copy[key] = value
+			}
+			if len(copy) == 0 {
+				return nil
+			}
+			return copy
 		}
-		out[key] = value
+	case []any:
+		{
+			copy := make([]any, 0)
+			for _, item := range t {
+				res := filter(item)
+				if res != nil {
+					copy = append(copy, res)
+				}
+			}
+			if len(copy) == 0 {
+				return nil
+			}
+			return copy
+		}
+	default:
+		{
+			return data
+		}
 	}
-	return UnFlatten(out)
 }
