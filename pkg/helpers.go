@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/url"
 	"regexp"
 	"strings"
 
@@ -92,7 +93,24 @@ func (q Query) OnJSONStream(stream io.ReadCloser) (*Result, error) {
 }
 
 func (r Result) ToJSON() (http.JSON, error) {
-	res := filter(r.result.([]any)[0])
+	var data map[string]any
+	if value, ok := r.result.([]any); ok {
+		if len(value) == 0 {
+			return "", nil
+		}
+		value, ok := value[0].(map[string]any)
+		if !ok {
+			return "", fmt.Errorf("expected map but recieved %T", value)
+		}
+		data = value
+	} else {
+		value, ok := r.result.(map[string]any)
+		if !ok {
+			return "", fmt.Errorf("expected map but recieved %T", value)
+		}
+		data = value
+	}
+	res := filter(data)
 	if res == nil {
 		return http.JSON(""), nil
 	}
@@ -101,6 +119,35 @@ func (r Result) ToJSON() (http.JSON, error) {
 		return "", err
 	}
 	return http.JSON(json), nil
+}
+
+func (r Result) ToURLEncoded() (http.URLEncoded, error) {
+	var data map[string]any
+	if value, ok := r.result.([]any); ok {
+		if len(value) == 0 {
+			return nil, nil
+		}
+		value, ok := value[0].(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("expected map but recieved %T", value)
+		}
+		data = value
+	} else {
+		value, ok := r.result.(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("expected map but recieved %T", value)
+		}
+		data = value
+	}
+	res := filter(data)
+	if res == nil {
+		return nil, nil
+	}
+	urlEncoded := url.Values{}
+	for key, value := range res.(map[string]any) {
+		urlEncoded.Add(key, fmt.Sprintf("%v", value))
+	}
+	return urlEncoded, nil
 }
 
 func (r Result) ToProtobuf(m proto.Message) error {
@@ -115,10 +162,24 @@ func (r Result) ToProtobuf(m proto.Message) error {
 }
 
 func (r Result) QueryParams() (map[string][]string, error) {
-	if len(r.result.([]any)) == 0 {
-		return nil, nil
+	var data map[string]any
+	if value, ok := r.result.([]any); ok {
+		if len(value) == 0 {
+			return nil, nil
+		}
+		value, ok := value[0].(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("expected map but recieved %T", value)
+		}
+		data = value
+	} else {
+		value, ok := r.result.(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("expected map but recieved %T", value)
+		}
+		data = value
 	}
-	flattened := FlattenMap(r.result.([]any)[0].(map[string]any))
+	flattened := FlattenMap(data)
 	pattern := `\{.*?\}`
 	re := regexp.MustCompile(pattern)
 	out := make(map[string][]string)
@@ -154,10 +215,24 @@ func (r Result) QueryParams() (map[string][]string, error) {
 }
 
 func (r Result) RouteValues() (map[string]string, error) {
-	if len(r.result.([]any)) == 0 {
-		return nil, nil
+	var data map[string]any
+	if value, ok := r.result.([]any); ok {
+		if len(value) == 0 {
+			return nil, nil
+		}
+		value, ok := value[0].(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("expected map but recieved %T", value)
+		}
+		data = value
+	} else {
+		value, ok := r.result.(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("expected map but recieved %T", value)
+		}
+		data = value
 	}
-	flattened := FlattenMap(r.result.([]any)[0].(map[string]any))
+	flattened := FlattenMap(data)
 	out := make(map[string]string)
 	for key, value := range flattened {
 		n := strings.Count(key, ":")
@@ -198,6 +273,32 @@ func ToJSONReq[TReq proto.Message](m TReq, reqMapper []byte) (*Request[http.JSON
 		RouteValues: routeValue,
 		QueryParams: query,
 		Body:        json,
+	}
+	return &req, nil
+}
+
+func ToURLEncodedReq[TReq proto.Message](m TReq, reqMapper []byte) (*Request[http.URLEncoded], error) {
+	r, err := New(string(reqMapper)).OnProtobuf(m)
+	if err != nil {
+		return nil, err
+	}
+	routeValue, err := r.RouteValues()
+	if err != nil {
+		return nil, err
+	}
+	query, err := r.QueryParams()
+	if err != nil {
+		return nil, err
+	}
+	values, err := r.ToURLEncoded()
+	if err != nil {
+		return nil, err
+	}
+
+	req := Request[http.URLEncoded]{
+		RouteValues: routeValue,
+		QueryParams: query,
+		Body:        values,
 	}
 	return &req, nil
 }
