@@ -194,8 +194,10 @@ func (r Result) QueryParams() (map[string][]string, error) {
 		k := strings.Split(key, "$")[1]
 		n = strings.Count(k, ".")
 		if n == 0 {
-			out[k] = make([]string, 1)
-			out[k][0] = fmt.Sprintf("%v", value)
+			if value != nil {
+				out[k] = make([]string, 1)
+				out[k][0] = fmt.Sprintf("%v", value)
+			}
 			continue
 		}
 		dim := re.FindAll([]byte(k), -1)
@@ -209,7 +211,9 @@ func (r Result) QueryParams() (map[string][]string, error) {
 		if _, ok := out[k]; !ok {
 			out[k] = make([]string, 0)
 		}
-		out[k] = append(out[k], fmt.Sprintf("%v", value))
+		if value != nil {
+			out[k] = append(out[k], fmt.Sprintf("%v", value))
+		}
 	}
 	return out, nil
 }
