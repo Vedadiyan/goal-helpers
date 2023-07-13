@@ -326,9 +326,7 @@ func ExecToMap[TReq proto.Message](m TReq, reqMapper []byte) (map[string]any, er
 	}
 	out, ok := res.result.(map[string]any)
 	if !ok {
-		return map[string]any{
-			"data": res.result,
-		}, nil
+		return res.result.([]any)[0].(map[string]any), nil
 	}
 	return out, nil
 }
