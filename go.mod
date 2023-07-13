@@ -5,13 +5,12 @@ go 1.19
 require (
 	github.com/gofiber/fiber/v2 v2.46.0
 	github.com/nats-io/nats.go v1.26.0
-	github.com/vedadiyan/goal v0.0.0-20230503141128-c533b511e178
+	github.com/vedadiyan/goal v0.0.0-20230702123208-0c9f97e514a7
 	github.com/vedadiyan/gql v0.0.0-20230420112559-5650e7c6aef2
 	google.golang.org/protobuf v1.30.0
 )
 
 require (
-	github.com/DataDog/zstd v1.5.5 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
@@ -26,7 +25,8 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
-	github.com/nats-io/nats-server/v2 v2.9.17 // indirect
+	github.com/minio/highwayhash v1.0.2 // indirect
+	github.com/nats-io/jwt/v2 v2.4.1 // indirect
 	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/philhofer/fwd v1.1.2 // indirect
@@ -50,6 +50,7 @@ require (
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
+	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/genproto v0.0.0-20210701191553-46259e63a0a9 // indirect
 	google.golang.org/grpc v1.45.0 // indirect
 )

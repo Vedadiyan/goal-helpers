@@ -319,6 +319,32 @@ func Exec[TReq proto.Message, TRes proto.Message](m TReq, reqMapper []byte, r TR
 	return nil
 }
 
+func ExecToMap[TReq proto.Message](m TReq, reqMapper []byte) (map[string]any, error) {
+	res, err := New(string(reqMapper)).OnProtobuf(m)
+	if err != nil {
+		return nil, err
+	}
+	out, ok := res.result.(map[string]any)
+	if !ok {
+		return map[string]any{
+			"data": res.result,
+		}, nil
+	}
+	return out, nil
+}
+
+func ExecFromMap[TRes proto.Message](in map[string]any, resMapper []byte, r TRes) error {
+	res, err := New(string(resMapper)).exec(in)
+	if err != nil {
+		return err
+	}
+	err = protoutil.Unmarshal(res, r)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte, m TRes) error {
 	r, err := New(string(resMapper)).OnJSONStream(data)
 	if err != nil {
