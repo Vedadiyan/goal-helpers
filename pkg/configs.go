@@ -3,21 +3,22 @@ package helpers
 import (
 	"github.com/nats-io/nats.go"
 	auto "github.com/vedadiyan/goal/pkg/config/auto"
+	"github.com/vedadiyan/goal/pkg/db/postgres"
 	"github.com/vedadiyan/goal/pkg/di"
 	"github.com/vedadiyan/goal/pkg/insight"
 )
 
-func AddNats(configName string, connName string) {
+func AddNats(configName string) {
 	init := false
 	nats := auto.New(configName, true, func(value string) {
 		if !init {
 			init = true
-			di.AddSinletonWithName(connName, func() (*nats.Conn, error) {
+			di.AddSinletonWithName(configName, func() (*nats.Conn, error) {
 				return nats.Connect(value)
 			})
 			return
 		}
-		di.RefreshSinletonWithName(connName, func(current *nats.Conn) (*nats.Conn, error) {
+		di.RefreshSinletonWithName(configName, func(current *nats.Conn) (*nats.Conn, error) {
 			current.Drain()
 			return nats.Connect(value)
 		})
@@ -25,7 +26,25 @@ func AddNats(configName string, connName string) {
 	auto.Register(nats)
 }
 
-func UseInfluxDb(configName string, bucket string) {
+func AddPostgres(configName string) {
+	init := false
+	nats := auto.New(configName, true, func(value string) {
+		if !init {
+			init = true
+			di.AddSinletonWithName(configName, func() (*postgres.Pool, error) {
+				return postgres.New(value, 100, 10)
+			})
+			return
+		}
+		di.RefreshSinletonWithName(configName, func(current *postgres.Pool) (*postgres.Pool, error) {
+			current.Close()
+			return postgres.New(value, 100, 10)
+		})
+	})
+	auto.Register(nats)
+}
+
+func AddInfluxDb(configName string, bucket string) {
 	influxDb := auto.New(configName, false, func(value auto.KeyValue) {
 		dsn, err := value.GetStringValue("dsn")
 		if err != nil {
