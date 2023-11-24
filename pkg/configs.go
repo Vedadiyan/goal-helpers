@@ -1,11 +1,16 @@
 package helpers
 
 import (
+	"context"
+
 	"github.com/nats-io/nats.go"
+	"github.com/redis/go-redis/v9"
 	auto "github.com/vedadiyan/goal/pkg/config/auto"
 	"github.com/vedadiyan/goal/pkg/db/postgres"
 	"github.com/vedadiyan/goal/pkg/di"
 	"github.com/vedadiyan/goal/pkg/insight"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func AddNats(configName string) {
@@ -28,7 +33,7 @@ func AddNats(configName string) {
 
 func AddPostgres(configName string) {
 	init := false
-	nats := auto.New(configName, true, func(value string) {
+	postgres := auto.New(configName, true, func(value string) {
 		if !init {
 			init = true
 			di.AddSinletonWithName(configName, func() (*postgres.Pool, error) {
@@ -41,7 +46,47 @@ func AddPostgres(configName string) {
 			return postgres.New(value, 100, 10)
 		})
 	})
-	auto.Register(nats)
+	auto.Register(postgres)
+}
+
+func AddRedis(configName string) {
+	init := false
+	mongodb := auto.New(configName, true, func(value string) {
+		if !init {
+			init = true
+			di.AddSinletonWithName(configName, func() (*redis.Client, error) {
+				return redis.NewClient(&redis.Options{
+					Addr: value,
+				}), nil
+			})
+			return
+		}
+		di.RefreshSinletonWithName(configName, func(current *redis.Client) (*redis.Client, error) {
+			current.Close()
+			return redis.NewClient(&redis.Options{
+				Addr: value,
+			}), nil
+		})
+	})
+	auto.Register(mongodb)
+}
+
+func AddMongo(configName string) {
+	init := false
+	mongodb := auto.New(configName, true, func(value string) {
+		if !init {
+			init = true
+			di.AddSinletonWithName(configName, func() (*mongo.Client, error) {
+				return mongo.Connect(context.TODO(), options.Client().ApplyURI(value))
+			})
+			return
+		}
+		di.RefreshSinletonWithName(configName, func(current *mongo.Client) (*mongo.Client, error) {
+			current.Disconnect(context.TODO())
+			return mongo.Connect(context.TODO(), options.Client().ApplyURI(value))
+		})
+	})
+	auto.Register(mongodb)
 }
 
 func AddInfluxDb(configName string, bucket string) {
