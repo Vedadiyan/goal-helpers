@@ -9,9 +9,23 @@ import (
 	"github.com/vedadiyan/goal/pkg/db/postgres"
 	"github.com/vedadiyan/goal/pkg/di"
 	"github.com/vedadiyan/goal/pkg/insight"
+	mng "github.com/vedadiyan/gql/pkg/functions/mongo"
+	rds "github.com/vedadiyan/gql/pkg/functions/redis"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+func init() {
+	mng.RegisterConManager(func(connKey string) (*mongo.Client, error) {
+		client, err := di.ResolveWithName[*mongo.Client](connKey, nil)
+		return *client, err
+	})
+	rds.RegisterConManager(func(connKey string) (*redis.Client, error) {
+		client, err := di.ResolveWithName[*redis.Client](connKey, nil)
+		return *client, err
+	})
+
+}
 
 func AddNats(configName string) {
 	init := false

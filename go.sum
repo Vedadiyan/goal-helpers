@@ -4,6 +4,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/andybalholm/brotli v1.0.5 h1:8uQZIdzKmjc/iuPu7O2ioW48L81FgatrcpfFmiq/cCs=
 github.com/andybalholm/brotli v1.0.5/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
+github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
+github.com/bsm/gomega v1.27.10 h1:yeMWxP2pV2fG3FgAODIY8EiRE3dy0aeFYt4l7wh6yKA=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cespare/xxhash/v2 v2.2.0 h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj44=
@@ -169,8 +171,8 @@ github.com/valyala/tcplisten v1.0.0 h1:rBHj/Xf+E1tRGZyWIWwJDiRY0zc1Js+CV5DqwacVS
 github.com/valyala/tcplisten v1.0.0/go.mod h1:T0xQ8SeCZGxckz9qRXTfG43PvQ/mcWh7FwZEA7Ioqkc=
 github.com/vedadiyan/goal v0.2.1 h1:87qgqQjIZqgBalvjDmCSwcL+MBUgww6x3rh99il4v2E=
 github.com/vedadiyan/goal v0.2.1/go.mod h1:uiuX9tuP9DCSES+CJSjFCazK6nv6bGsEl5sqm+rVJ5E=
-github.com/vedadiyan/gql v0.0.0-20230420112559-5650e7c6aef2 h1:4UyKotPWkGOftNpaMspj1S4Knr2gPX/kt2CG9FWyOAk=
-github.com/vedadiyan/gql v0.0.0-20230420112559-5650e7c6aef2/go.mod h1:tswqox3mxrbrWSlQTepS5ruCiIFSkx7TwhaK+SMGdkc=
+github.com/vedadiyan/gql v0.1.0 h1:7F2aQVkgCf08R1DpcAWkQK5A6RFfC+fIphMW5Ywvm3c=
+github.com/vedadiyan/gql v0.1.0/go.mod h1:7wEGTBO5qbm4XGlQcYu3waEnwITkKSxN0CaijloaEEc=
 github.com/vedadiyan/sqlparser v0.0.0-20230215084946-7cbf4d107dab h1:dSZO3PgDOfq3wY5DeDbT3ALk01W0XMPBiscrcRMrKhs=
 github.com/vedadiyan/sqlparser v0.0.0-20230215084946-7cbf4d107dab/go.mod h1:bXhSdIPIU5uN9q2zsk/7gB436SiX6B5mm+049VVWJCY=
 github.com/xdg-go/pbkdf2 v1.0.0 h1:Su7DPu48wXMwC3bs7MCNG+z4FhcyEuz5dlvchbq0B0c=

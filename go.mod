@@ -5,8 +5,10 @@ go 1.19
 require (
 	github.com/gofiber/fiber/v2 v2.46.0
 	github.com/nats-io/nats.go v1.26.0
+	github.com/redis/go-redis/v9 v9.3.0
 	github.com/vedadiyan/goal v0.2.1
-	github.com/vedadiyan/gql v0.0.0-20230420112559-5650e7c6aef2
+	github.com/vedadiyan/gql v0.1.0
+	go.mongodb.org/mongo-driver v1.13.0
 	google.golang.org/protobuf v1.30.0
 )
 
@@ -39,7 +41,6 @@ require (
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/philhofer/fwd v1.1.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/redis/go-redis/v9 v9.3.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/savsgio/dictpool v0.0.0-20221023140959-7bf2e61cea94 // indirect
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
@@ -56,7 +57,6 @@ require (
 	go.etcd.io/etcd/api/v3 v3.5.9 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.9 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.9 // indirect
-	go.mongodb.org/mongo-driver v1.13.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.17.0 // indirect
