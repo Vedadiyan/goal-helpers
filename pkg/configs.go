@@ -2,9 +2,11 @@ package helpers
 
 import (
 	"context"
+	"sync"
 
 	"github.com/nats-io/nats.go"
 	"github.com/redis/go-redis/v9"
+	"github.com/vedadiyan/genql"
 	"github.com/vedadiyan/genql-extensions/functions"
 	auto "github.com/vedadiyan/goal/pkg/config/auto"
 	"github.com/vedadiyan/goal/pkg/db/postgres"
@@ -12,6 +14,11 @@ import (
 	"github.com/vedadiyan/goal/pkg/insight"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+var (
+	_redisFunction sync.Once
+	_mongoFunction sync.Once
 )
 
 func AddNats(configName string) {
@@ -52,6 +59,9 @@ func AddPostgres(configName string) {
 
 func AddRedis(configName string) {
 	init := false
+	_redisFunction.Do(func() {
+		genql.RegisterExternalFunction("redis", functions.RedisFunc)
+	})
 	mongodb := auto.New(configName, true, func(value string) {
 		if !init {
 			init = true
@@ -77,6 +87,9 @@ func AddRedis(configName string) {
 
 func AddMongo(configName string) {
 	init := false
+	_mongoFunction.Do(func() {
+		genql.RegisterExternalFunction("mongo", functions.MongoFunc)
+	})
 	mongodb := auto.New(configName, true, func(value string) {
 		if !init {
 			init = true
