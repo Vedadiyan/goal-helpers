@@ -9,9 +9,10 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/vedadiyan/genql"
 	"github.com/vedadiyan/goal/pkg/http"
 	"github.com/vedadiyan/goal/pkg/protoutil"
-	"github.com/vedadiyan/gql/pkg/sql"
+
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
@@ -41,8 +42,7 @@ func (q Query) exec(data map[string]any) (any, error) {
 	if q.query == "" {
 		return data, nil
 	}
-	query := sql.New(data)
-	err := query.Prepare(q.query)
+	query, err := genql.New(data, q.query, genql.Wrapped(), genql.PostgresEscapingDialect())
 	if err != nil {
 		return nil, err
 	}

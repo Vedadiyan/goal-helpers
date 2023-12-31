@@ -5,27 +5,14 @@ import (
 
 	"github.com/nats-io/nats.go"
 	"github.com/redis/go-redis/v9"
+	"github.com/vedadiyan/genql-extensions/functions"
 	auto "github.com/vedadiyan/goal/pkg/config/auto"
 	"github.com/vedadiyan/goal/pkg/db/postgres"
 	"github.com/vedadiyan/goal/pkg/di"
 	"github.com/vedadiyan/goal/pkg/insight"
-	mng "github.com/vedadiyan/gql/pkg/functions/mongo"
-	rds "github.com/vedadiyan/gql/pkg/functions/redis"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-func init() {
-	mng.RegisterConManager(func(connKey string) (*mongo.Client, error) {
-		client, err := di.ResolveWithName[*mongo.Client](connKey, nil)
-		return *client, err
-	})
-	rds.RegisterConManager(func(connKey string) (*redis.Client, error) {
-		client, err := di.ResolveWithName[*redis.Client](connKey, nil)
-		return *client, err
-	})
-
-}
 
 func AddNats(configName string) {
 	init := false
@@ -68,6 +55,9 @@ func AddRedis(configName string) {
 	mongodb := auto.New(configName, true, func(value string) {
 		if !init {
 			init = true
+			functions.RegisterRedisConnection(configName, func() (*redis.Client, error) {
+				return di.ResolveWithName[redis.Client](configName, nil)
+			})
 			di.AddSinletonWithName(configName, func() (*redis.Client, error) {
 				return redis.NewClient(&redis.Options{
 					Addr: value,
@@ -90,6 +80,9 @@ func AddMongo(configName string) {
 	mongodb := auto.New(configName, true, func(value string) {
 		if !init {
 			init = true
+			functions.RegisterMongoConnection(configName, func() (*mongo.Client, error) {
+				return di.ResolveWithName[mongo.Client](configName, nil)
+			})
 			di.AddSinletonWithName(configName, func() (*mongo.Client, error) {
 				return mongo.Connect(context.TODO(), options.Client().ApplyURI(value))
 			})
