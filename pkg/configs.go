@@ -62,12 +62,12 @@ func AddRedis(configName string) {
 	_redisFunction.Do(func() {
 		genql.RegisterExternalFunction("redis", functions.RedisFunc)
 	})
+	functions.RegisterRedisConnection(configName, func() (*redis.Client, error) {
+		return di.ResolveWithName[redis.Client](configName, nil)
+	})
 	mongodb := auto.New(configName, true, func(value string) {
 		if !init {
 			init = true
-			functions.RegisterRedisConnection(configName, func() (*redis.Client, error) {
-				return di.ResolveWithName[redis.Client](configName, nil)
-			})
 			di.AddSinletonWithName(configName, func() (*redis.Client, error) {
 				return redis.NewClient(&redis.Options{
 					Addr: value,
@@ -90,12 +90,12 @@ func AddMongo(configName string) {
 	_mongoFunction.Do(func() {
 		genql.RegisterExternalFunction("mongo", functions.MongoFunc)
 	})
+	functions.RegisterMongoConnection(configName, func() (*mongo.Client, error) {
+		return di.ResolveWithName[mongo.Client](configName, nil)
+	})
 	mongodb := auto.New(configName, true, func(value string) {
 		if !init {
 			init = true
-			functions.RegisterMongoConnection(configName, func() (*mongo.Client, error) {
-				return di.ResolveWithName[mongo.Client](configName, nil)
-			})
 			di.AddSinletonWithName(configName, func() (*mongo.Client, error) {
 				return mongo.Connect(context.TODO(), options.Client().ApplyURI(value))
 			})
