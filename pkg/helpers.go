@@ -154,7 +154,7 @@ func (r Result) ToProtobuf(m proto.Message) error {
 	// if len(r.result.([]any)) == 0 {
 	// 	return nil
 	// }
-	err := protoutil.Unmarshal(r.result, m)
+	err := protoutil.Unmarshal(r.result.([]any)[0].(map[string]any), m)
 	if err != nil {
 		return err
 	}
@@ -336,7 +336,7 @@ func ExecFromMap[TRes proto.Message](in map[string]any, resMapper []byte, r TRes
 	if err != nil {
 		return err
 	}
-	err = protoutil.Unmarshal(res, r)
+	err = protoutil.Unmarshal(res.([]any)[0].(map[string]any), r)
 	if err != nil {
 		return err
 	}
