@@ -45,7 +45,7 @@ func AddPostgres(configName string) {
 		if !init {
 			init = true
 			di.AddSinletonWithName(configName, func() (*postgres.Pool, error) {
-				return postgres.New(value, 100, 10)
+				return postgres.New(value, 10, 5)
 			})
 			return
 		}
