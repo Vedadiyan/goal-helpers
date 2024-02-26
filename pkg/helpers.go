@@ -22,7 +22,8 @@ type Result struct {
 }
 
 type Query struct {
-	query string
+	query     string
+	constants map[string]any
 }
 
 type Request[T any] struct {
@@ -31,9 +32,10 @@ type Request[T any] struct {
 	Body        T
 }
 
-func New(query string) *Query {
+func New(query string, constants map[string]any) *Query {
 	q := Query{
-		query: query,
+		query:     query,
+		constants: constants,
 	}
 	return &q
 }
@@ -42,7 +44,7 @@ func (q Query) exec(data map[string]any) (any, error) {
 	if q.query == "" {
 		return data, nil
 	}
-	query, err := genql.New(data, q.query, genql.Wrapped(), genql.PostgresEscapingDialect())
+	query, err := genql.New(data, q.query, genql.Wrapped(), genql.PostgresEscapingDialect(), genql.WithConstants(q.constants))
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +259,11 @@ func (r Result) RouteValues() (map[string]string, error) {
 }
 
 func ToJSONReq[TReq proto.Message](m TReq, reqMapper []byte) (*Request[http.JSON], error) {
-	r, err := New(string(reqMapper)).OnProtobuf(m)
+	return ToJSONReqWithConstants[TReq](m, reqMapper, nil)
+}
+
+func ToJSONReqWithConstants[TReq proto.Message](m TReq, reqMapper []byte, constants map[string]any) (*Request[http.JSON], error) {
+	r, err := New(string(reqMapper), constants).OnProtobuf(m)
 	if err != nil {
 		return nil, err
 	}
@@ -282,7 +288,11 @@ func ToJSONReq[TReq proto.Message](m TReq, reqMapper []byte) (*Request[http.JSON
 }
 
 func ToURLEncodedReq[TReq proto.Message](m TReq, reqMapper []byte) (*Request[http.URLEncoded], error) {
-	r, err := New(string(reqMapper)).OnProtobuf(m)
+	return ToURLEncodedReqWithConstants[TReq](m, reqMapper, nil)
+}
+
+func ToURLEncodedReqWithConstants[TReq proto.Message](m TReq, reqMapper []byte, constants map[string]any) (*Request[http.URLEncoded], error) {
+	r, err := New(string(reqMapper), constants).OnProtobuf(m)
 	if err != nil {
 		return nil, err
 	}
@@ -308,7 +318,11 @@ func ToURLEncodedReq[TReq proto.Message](m TReq, reqMapper []byte) (*Request[htt
 }
 
 func Exec[TReq proto.Message, TRes proto.Message](m TReq, reqMapper []byte, r TRes) error {
-	res, err := New(string(reqMapper)).OnProtobuf(m)
+	return ExecWithConstants[TReq, TRes](m, reqMapper, r, nil)
+}
+
+func ExecWithConstants[TReq proto.Message, TRes proto.Message](m TReq, reqMapper []byte, r TRes, constants map[string]any) error {
+	res, err := New(string(reqMapper), constants).OnProtobuf(m)
 	if err != nil {
 		return err
 	}
@@ -320,7 +334,11 @@ func Exec[TReq proto.Message, TRes proto.Message](m TReq, reqMapper []byte, r TR
 }
 
 func ExecToMap[TReq proto.Message](m TReq, reqMapper []byte) (map[string]any, error) {
-	res, err := New(string(reqMapper)).OnProtobuf(m)
+	return ExecToMapWithConstants[TReq](m, reqMapper, nil)
+}
+
+func ExecToMapWithConstants[TReq proto.Message](m TReq, reqMapper []byte, constants map[string]any) (map[string]any, error) {
+	res, err := New(string(reqMapper), constants).OnProtobuf(m)
 	if err != nil {
 		return nil, err
 	}
@@ -332,7 +350,11 @@ func ExecToMap[TReq proto.Message](m TReq, reqMapper []byte) (map[string]any, er
 }
 
 func ExecFromMap[TRes proto.Message](in map[string]any, resMapper []byte, r TRes) error {
-	res, err := New(string(resMapper)).exec(in)
+	return ExecFromMapWithConstants[TRes](in, resMapper, r, nil)
+}
+
+func ExecFromMapWithConstants[TRes proto.Message](in map[string]any, resMapper []byte, r TRes, constants map[string]any) error {
+	res, err := New(string(resMapper), constants).exec(in)
 	if err != nil {
 		return err
 	}
@@ -344,7 +366,11 @@ func ExecFromMap[TRes proto.Message](in map[string]any, resMapper []byte, r TRes
 }
 
 func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte, m TRes) error {
-	r, err := New(string(resMapper)).OnJSONStream(data)
+	return FromJSONResWithConstants[TRes](data, resMapper, m, nil)
+}
+
+func FromJSONResWithConstants[TRes proto.Message](data io.ReadCloser, resMapper []byte, m TRes, constants map[string]any) error {
+	r, err := New(string(resMapper), constants).OnJSONStream(data)
 	if err != nil {
 		return err
 	}
