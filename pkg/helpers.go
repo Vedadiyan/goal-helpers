@@ -22,8 +22,8 @@ type Result struct {
 }
 
 type Query struct {
-	query     string
-	constants map[string]any
+	query   string
+	options []genql.QueryOption
 }
 
 type Request[T any] struct {
@@ -32,10 +32,10 @@ type Request[T any] struct {
 	Body        T
 }
 
-func New(query string, constants map[string]any) *Query {
+func New(query string, options ...genql.QueryOption) *Query {
 	q := Query{
-		query:     query,
-		constants: constants,
+		query:   query,
+		options: options,
 	}
 	return &q
 }
@@ -44,7 +44,7 @@ func (q Query) exec(data map[string]any) (any, error) {
 	if q.query == "" {
 		return data, nil
 	}
-	query, err := genql.New(data, q.query, genql.Wrapped(), genql.PostgresEscapingDialect(), genql.WithConstants(q.constants))
+	query, err := genql.New(data, q.query, q.options...)
 	if err != nil {
 		return nil, err
 	}
@@ -258,12 +258,8 @@ func (r Result) RouteValues() (map[string]string, error) {
 	return out, nil
 }
 
-func ToJSONReq[TReq proto.Message](m TReq, reqMapper []byte) (*Request[http.JSON], error) {
-	return ToJSONReqWithConstants[TReq](m, reqMapper, nil)
-}
-
-func ToJSONReqWithConstants[TReq proto.Message](m TReq, reqMapper []byte, constants map[string]any) (*Request[http.JSON], error) {
-	r, err := New(string(reqMapper), constants).OnProtobuf(m)
+func ToJSONReq[TReq proto.Message](m TReq, reqMapper []byte, options ...genql.QueryOption) (*Request[http.JSON], error) {
+	r, err := New(string(reqMapper), options...).OnProtobuf(m)
 	if err != nil {
 		return nil, err
 	}
@@ -287,12 +283,8 @@ func ToJSONReqWithConstants[TReq proto.Message](m TReq, reqMapper []byte, consta
 	return &req, nil
 }
 
-func ToURLEncodedReq[TReq proto.Message](m TReq, reqMapper []byte) (*Request[http.URLEncoded], error) {
-	return ToURLEncodedReqWithConstants[TReq](m, reqMapper, nil)
-}
-
-func ToURLEncodedReqWithConstants[TReq proto.Message](m TReq, reqMapper []byte, constants map[string]any) (*Request[http.URLEncoded], error) {
-	r, err := New(string(reqMapper), constants).OnProtobuf(m)
+func ToURLEncodedReq[TReq proto.Message](m TReq, reqMapper []byte, options ...genql.QueryOption) (*Request[http.URLEncoded], error) {
+	r, err := New(string(reqMapper), options...).OnProtobuf(m)
 	if err != nil {
 		return nil, err
 	}
@@ -317,12 +309,8 @@ func ToURLEncodedReqWithConstants[TReq proto.Message](m TReq, reqMapper []byte, 
 	return &req, nil
 }
 
-func Exec[TReq proto.Message, TRes proto.Message](m TReq, reqMapper []byte, r TRes) error {
-	return ExecWithConstants[TReq, TRes](m, reqMapper, r, nil)
-}
-
-func ExecWithConstants[TReq proto.Message, TRes proto.Message](m TReq, reqMapper []byte, r TRes, constants map[string]any) error {
-	res, err := New(string(reqMapper), constants).OnProtobuf(m)
+func Exec[TReq proto.Message, TRes proto.Message](m TReq, reqMapper []byte, r TRes, options ...genql.QueryOption) error {
+	res, err := New(string(reqMapper), options...).OnProtobuf(m)
 	if err != nil {
 		return err
 	}
@@ -333,12 +321,8 @@ func ExecWithConstants[TReq proto.Message, TRes proto.Message](m TReq, reqMapper
 	return nil
 }
 
-func ExecToMap[TReq proto.Message](m TReq, reqMapper []byte) (map[string]any, error) {
-	return ExecToMapWithConstants[TReq](m, reqMapper, nil)
-}
-
-func ExecToMapWithConstants[TReq proto.Message](m TReq, reqMapper []byte, constants map[string]any) (map[string]any, error) {
-	res, err := New(string(reqMapper), constants).OnProtobuf(m)
+func ExecToMap[TReq proto.Message](m TReq, reqMapper []byte, options ...genql.QueryOption) (map[string]any, error) {
+	res, err := New(string(reqMapper), options...).OnProtobuf(m)
 	if err != nil {
 		return nil, err
 	}
@@ -349,12 +333,8 @@ func ExecToMapWithConstants[TReq proto.Message](m TReq, reqMapper []byte, consta
 	return out, nil
 }
 
-func ExecFromMap[TRes proto.Message](in map[string]any, resMapper []byte, r TRes) error {
-	return ExecFromMapWithConstants[TRes](in, resMapper, r, nil)
-}
-
-func ExecFromMapWithConstants[TRes proto.Message](in map[string]any, resMapper []byte, r TRes, constants map[string]any) error {
-	res, err := New(string(resMapper), constants).exec(in)
+func ExecFromMap[TRes proto.Message](in map[string]any, resMapper []byte, r TRes, options ...genql.QueryOption) error {
+	res, err := New(string(resMapper), options...).exec(in)
 	if err != nil {
 		return err
 	}
@@ -365,12 +345,8 @@ func ExecFromMapWithConstants[TRes proto.Message](in map[string]any, resMapper [
 	return nil
 }
 
-func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte, m TRes) error {
-	return FromJSONResWithConstants[TRes](data, resMapper, m, nil)
-}
-
-func FromJSONResWithConstants[TRes proto.Message](data io.ReadCloser, resMapper []byte, m TRes, constants map[string]any) error {
-	r, err := New(string(resMapper), constants).OnJSONStream(data)
+func FromJSONRes[TRes proto.Message](data io.ReadCloser, resMapper []byte, m TRes, options ...genql.QueryOption) error {
+	r, err := New(string(resMapper), options...).OnJSONStream(data)
 	if err != nil {
 		return err
 	}
