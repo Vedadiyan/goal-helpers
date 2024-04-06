@@ -6,10 +6,10 @@ require (
 	github.com/gofiber/fiber/v2 v2.46.0
 	github.com/nats-io/nats.go v1.26.0
 	github.com/redis/go-redis/v9 v9.3.1
-	github.com/vedadiyan/genql v1.2.2
-	github.com/vedadiyan/genql-extensions v0.0.0-20231229060837-25751f03558e
-	github.com/vedadiyan/goal v0.2.8
-	go.mongodb.org/mongo-driver v1.13.1
+	github.com/vedadiyan/genql v1.2.4
+	github.com/vedadiyan/genql-extensions v1.0.0
+	github.com/vedadiyan/goal v0.3.0
+	go.mongodb.org/mongo-driver v1.14.0
 	google.golang.org/protobuf v1.30.0
 )
 
@@ -62,11 +62,11 @@ require (
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.17.0 // indirect
-	golang.org/x/crypto v0.14.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/genproto v0.0.0-20210701191553-46259e63a0a9 // indirect
 	google.golang.org/grpc v1.45.0 // indirect
