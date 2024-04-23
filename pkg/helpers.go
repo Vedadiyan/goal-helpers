@@ -249,10 +249,6 @@ func (r Result) RouteValues() (map[string]string, error) {
 			return nil, fmt.Errorf("ambiguous route value definition")
 		}
 		k := strings.Split(key, ":")[1]
-		n = strings.Count(k, ".")
-		if n == 0 {
-			return nil, fmt.Errorf("ambiguous route value definition")
-		}
 		out[k] = fmt.Sprintf("%v", value)
 	}
 	return out, nil
