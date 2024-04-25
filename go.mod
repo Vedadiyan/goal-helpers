@@ -8,7 +8,7 @@ require (
 	github.com/redis/go-redis/v9 v9.3.1
 	github.com/vedadiyan/genql v1.2.5
 	github.com/vedadiyan/genql-extensions v1.0.0
-	github.com/vedadiyan/goal v0.3.1
+	github.com/vedadiyan/goal v0.3.2
 	go.mongodb.org/mongo-driver v1.14.0
 	google.golang.org/protobuf v1.30.0
 )
