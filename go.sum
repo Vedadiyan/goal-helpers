@@ -170,8 +170,8 @@ github.com/valyala/fasttemplate v1.0.1/go.mod h1:UQGH1tvbgY+Nz5t2n7tXsz52dQxojPU
 github.com/valyala/fasttemplate v1.2.1/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
 github.com/valyala/tcplisten v1.0.0 h1:rBHj/Xf+E1tRGZyWIWwJDiRY0zc1Js+CV5DqwacVSA8=
 github.com/valyala/tcplisten v1.0.0/go.mod h1:T0xQ8SeCZGxckz9qRXTfG43PvQ/mcWh7FwZEA7Ioqkc=
-github.com/vedadiyan/genql v1.2.5 h1:nL/l5MLCtewSf9c9obubQrHCK3tVvmxm1TQpGbM92bQ=
-github.com/vedadiyan/genql v1.2.5/go.mod h1:pLBQUgWBoCWJfstJfm9eOvAgCxV3ddergZbO5f+sESo=
+github.com/vedadiyan/genql v1.2.6 h1:tFt3MZ2gwVMepJX6IK0mfACjKozEzXO5TACBWrwxr3M=
+github.com/vedadiyan/genql v1.2.6/go.mod h1:pLBQUgWBoCWJfstJfm9eOvAgCxV3ddergZbO5f+sESo=
 github.com/vedadiyan/genql-extensions v1.0.0 h1:QMpwQ0Pb7kRKgoFnxxYxO6OxienXSP9gVrGGHF3F8oc=
 github.com/vedadiyan/genql-extensions v1.0.0/go.mod h1:24PvSjnGoIxc5VpiMPtx2Jccz0yNK8OFFy2oX+NAxwo=
 github.com/vedadiyan/goal v0.3.2 h1:/u86RKBc7GN/Y3o0qQ5t3IkR/YdtCt578P6r3IBISDU=

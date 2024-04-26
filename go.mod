@@ -6,7 +6,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.46.0
 	github.com/nats-io/nats.go v1.26.0
 	github.com/redis/go-redis/v9 v9.3.1
-	github.com/vedadiyan/genql v1.2.5
+	github.com/vedadiyan/genql v1.2.6
 	github.com/vedadiyan/genql-extensions v1.0.0
 	github.com/vedadiyan/goal v0.3.2
 	go.mongodb.org/mongo-driver v1.14.0
