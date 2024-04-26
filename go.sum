@@ -174,8 +174,8 @@ github.com/vedadiyan/genql v1.2.6 h1:tFt3MZ2gwVMepJX6IK0mfACjKozEzXO5TACBWrwxr3M
 github.com/vedadiyan/genql v1.2.6/go.mod h1:pLBQUgWBoCWJfstJfm9eOvAgCxV3ddergZbO5f+sESo=
 github.com/vedadiyan/genql-extensions v1.0.0 h1:QMpwQ0Pb7kRKgoFnxxYxO6OxienXSP9gVrGGHF3F8oc=
 github.com/vedadiyan/genql-extensions v1.0.0/go.mod h1:24PvSjnGoIxc5VpiMPtx2Jccz0yNK8OFFy2oX+NAxwo=
-github.com/vedadiyan/goal v0.3.3 h1:wsL1Ztnooa796XJOZRGCMDOwm0ud+e3Ai8QjrMWTAc8=
-github.com/vedadiyan/goal v0.3.3/go.mod h1:uiuX9tuP9DCSES+CJSjFCazK6nv6bGsEl5sqm+rVJ5E=
+github.com/vedadiyan/goal v0.3.4 h1:H2HzUOlealo22YceKR2PH+qgcTptsLsgiBMBY7u6VvE=
+github.com/vedadiyan/goal v0.3.4/go.mod h1:uiuX9tuP9DCSES+CJSjFCazK6nv6bGsEl5sqm+rVJ5E=
 github.com/vedadiyan/sqlparser v1.0.0 h1:ST++TYQf4WYFDZs4iIABHJiUAts1YV2HH3GCLv8IwJQ=
 github.com/vedadiyan/sqlparser v1.0.0/go.mod h1:bXhSdIPIU5uN9q2zsk/7gB436SiX6B5mm+049VVWJCY=
 github.com/xdg-go/pbkdf2 v1.0.0 h1:Su7DPu48wXMwC3bs7MCNG+z4FhcyEuz5dlvchbq0B0c=
